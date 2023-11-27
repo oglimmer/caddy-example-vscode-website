@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    container_name: caddy
+    # command: docker-proxy --caddyfile-path /etc/caddy/Caddyfile
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./data/caddy_data:/data
+      - ./data/caddy_config:/config
+  vscode:
+    build: vscode
+    container_name: vscode-server
+    restart: unless-stopped
+  vscode-http:
+    build: vscode
+    command:
+      - "serve-web"
+      - "--host"
+      - "0.0.0.0"
+      - "--without-connection-token"
+      - "--accept-server-license-terms"
+    container_name: vscode-server-http
+    restart: unless-stopped
+    labels:
+      caddy: vscode.example.com
+      caddy.reverse_proxy: "{{upstreams 8000}}"
+      caddy.tls: internal
+  website:
+    image: nginx:alpine
+    container_name: website
+    restart: unless-stopped
+    volumes:
+      - ./site:/usr/share/nginx/html
+    labels:
+      caddy: web.example.com
+      caddy.reverse_proxy: "{{upstreams 80}}"
+      caddy.tls: internal

@@ -1,0 +1,7 @@
+web.example.com {
+	encode zstd gzip
+	# reverse_proxy localhost:8080
+	root * /srv
+	file_server
+	tls internal
+}
