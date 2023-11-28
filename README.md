@@ -1,5 +1,13 @@
 # vscode server (tunnel & http) plus a website with Caddy
 
+# Domains (fake domains)
+
+You have to add these domains to your /etc/hosts
+
+```
+127.0.0.1 web.example.com vscode.example.com grafana.example.com loki.example.com
+```
+
 Run via
 
 ```bash
@@ -18,7 +26,7 @@ Access at:
 
 https://vscode.example.com/
 
-!! THIS IS UNSECURED - NO TOKEN NEEDED !!
+Secured with basic auth: user/password (tne password is literally password)
 
 ## VSCode (tunnel)
 
@@ -29,6 +37,14 @@ docker logs vscode-server
 ```
 
 Then access it at the URL shown in the console.
+
+## Loki
+
+Loki is available via https://loki.example.com/loki/api/v1/push with user loki/loki
+
+## Grafana
+
+Grafana is available via https://grafana.example.com user admin:admin
 
 # Notes
 

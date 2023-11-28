@@ -43,6 +43,8 @@ services:
       caddy.reverse_proxy: "{{upstreams 8000}}"
       caddy.tls: internal
       caddy.import: "loggingConfig"
+      caddy.basicauth: "*"
+      caddy.basicauth.user: "$$2y$$10$$9eb3gFuk.ki5uHWtIf9Aqer7VQxBFn9Gf6O08zZhamHgnJxUo0fK2"
 
   website:
     image: nginx:alpine
@@ -118,6 +120,8 @@ services:
       caddy.reverse_proxy: "{{upstreams 9100}}"
       caddy.tls: internal
       caddy.import: "loggingConfig"
+      caddy.basicauth: "*"
+      caddy.basicauth.loki: "$$2y$$10$$PBjFajUuwiw0oF7s9hQw3OuKABcUuMNwScEH63XoBxwbc669A2fI2"
     restart: unless-stopped
 
   promtail:
