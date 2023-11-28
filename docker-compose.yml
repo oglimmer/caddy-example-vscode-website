@@ -42,6 +42,7 @@ services:
       caddy: vscode.example.com
       caddy.reverse_proxy: "{{upstreams 8000}}"
       caddy.tls: internal
+      caddy.import: "loggingConfig"
 
   website:
     image: nginx:alpine
@@ -53,6 +54,7 @@ services:
       caddy: web.example.com
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.tls: internal
+      caddy.import: "loggingConfig"
 
   grafana:
     image: grafana/grafana:latest
@@ -94,6 +96,7 @@ services:
       caddy: grafana.example.com
       caddy.reverse_proxy: "{{upstreams 3000}}"
       caddy.tls: internal
+      caddy.import: "loggingConfig"
     restart: unless-stopped
 
   prometheus:
@@ -114,6 +117,7 @@ services:
       caddy: loki.example.com
       caddy.reverse_proxy: "{{upstreams 9100}}"
       caddy.tls: internal
+      caddy.import: "loggingConfig"
     restart: unless-stopped
 
   promtail:

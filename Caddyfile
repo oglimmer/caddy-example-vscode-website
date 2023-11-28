@@ -1,4 +1,4 @@
-web.example.com {
+(loggingConfig) {
 	log {
 		output file /var/log/access.json
 		level INFO
@@ -8,15 +8,6 @@ web.example.com {
 	}
 }
 
-{
-	log {
-		output file /var/log/access.json
-		level INFO
-		format json {
-			time_format iso8601
-		}
-	}
-}
 
 :9000 {
 	metrics
