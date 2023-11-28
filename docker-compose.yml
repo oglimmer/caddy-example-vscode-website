@@ -4,23 +4,33 @@ services:
   caddy:
     image: lucaslorentz/caddy-docker-proxy:ci-alpine
     container_name: caddy
-    # command: docker-proxy --caddyfile-path /etc/caddy/Caddyfile
+    environment:
+      CADDY_DOCKER_CADDYFILE_PATH: /etc/caddy/Caddyfile
     restart: unless-stopped
     ports:
       - 80:80
       - 443:443
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      # - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./Caddyfile:/etc/caddy/Caddyfile
       - ./data/caddy_data:/data
       - ./data/caddy_config:/config
+      - ./data/access-logs:/var/log
+
   vscode:
     build: vscode
+    command:
+      - "code"
+      - "tunnel"
+      - "--accept-server-license-terms"
+      - "--random-name"
     container_name: vscode-server
     restart: unless-stopped
+
   vscode-http:
     build: vscode
     command:
+      - "code"
       - "serve-web"
       - "--host"
       - "0.0.0.0"
@@ -32,6 +42,7 @@ services:
       caddy: vscode.example.com
       caddy.reverse_proxy: "{{upstreams 8000}}"
       caddy.tls: internal
+
   website:
     image: nginx:alpine
     container_name: website
@@ -42,3 +53,75 @@ services:
       caddy: web.example.com
       caddy.reverse_proxy: "{{upstreams 80}}"
       caddy.tls: internal
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: false
+          version: 1
+          editable: false
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          orgId: 1
+          url: http://prometheus:9090
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    labels:
+      caddy: grafana.example.com
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+      caddy.tls: internal
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki    
+    command: -config.file=/etc/loki/local-config.yaml
+    labels:
+      caddy: loki.example.com
+      caddy.reverse_proxy: "{{upstreams 9100}}"
+      caddy.tls: internal
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail    
+    volumes:
+      - "./data/access-logs:/var/log"
+      - "./promtail-config.yml:/etc/promtail/promtail.yaml"
+      - "./data/promtail-data:/tmp/positions"
+    command: -config.file=/etc/promtail/promtail.yaml
+    restart: unless-stopped

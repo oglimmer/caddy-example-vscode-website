@@ -14,6 +14,3 @@ RUN useradd vscode && mkdir -p /home/vscode/ && \
 
 USER vscode
 
-ENTRYPOINT [ "code" ]
-
-CMD [ "tunnel" ]

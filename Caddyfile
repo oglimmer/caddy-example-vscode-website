@@ -1,7 +1,23 @@
 web.example.com {
-	encode zstd gzip
-	# reverse_proxy localhost:8080
-	root * /srv
-	file_server
-	tls internal
+	log {
+		output file /var/log/access.json
+		level INFO
+		format json {
+			time_format iso8601
+		}
+	}
+}
+
+{
+	log {
+		output file /var/log/access.json
+		level INFO
+		format json {
+			time_format iso8601
+		}
+	}
+}
+
+:9000 {
+	metrics
 }
