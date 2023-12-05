@@ -4,7 +4,7 @@ COPY my-app /opt/app
 
 WORKDIR /opt/app
 
-RUN npm install && npm run build
+RUN npm ci && npm run build
 
 FROM node
 
