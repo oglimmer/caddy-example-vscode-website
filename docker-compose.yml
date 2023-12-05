@@ -58,6 +58,16 @@ services:
       caddy.tls: internal
       caddy.import: "loggingConfig"
 
+  svelte:
+    build: ./svelte
+    container_name: svelte
+    restart: unless-stopped
+    labels:
+      caddy: svelte.example.com
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+      caddy.tls: internal
+      caddy.import: "loggingConfig"
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana

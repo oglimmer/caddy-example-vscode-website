@@ -5,7 +5,7 @@
 You have to add these domains to your /etc/hosts
 
 ```
-127.0.0.1 web.example.com vscode.example.com grafana.example.com loki.example.com
+127.0.0.1 web.example.com vscode.example.com grafana.example.com loki.example.com svelte.example.com
 ```
 
 Run via
@@ -14,11 +14,17 @@ Run via
 docker compose up --build -d
 ```
 
-## Website
+## Website serving static via nginx
 
 Access at:
 
 https://web.example.com/
+
+## Website serving a svelte build
+
+Access at:
+
+https://svelte.example.com/
 
 ## VSCode (browser)
 
